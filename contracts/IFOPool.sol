@@ -87,6 +87,8 @@ contract IFOPool is IIFOPool{
 	//event UnlockLP(address user,uint lpAmount);
 	//event ClaimTreasure(uint tokenAmount,uint treasureAmount);
 
+	event Fail(bytes bmessage);
+
 	modifier onlyFactory{
 		require(msg.sender == factory,'only factory');
 		_;
@@ -326,7 +328,7 @@ contract IFOPool is IIFOPool{
 
 	}
 
-	function initlp() external{
+	function initlp() public{
 		// make lpPair
 		address swapRouter = IIFOFactory(factory).swapRouter();
 
@@ -338,7 +340,7 @@ contract IFOPool is IIFOPool{
 		//bytes4 SELECTOR = bytes4(keccak256(bytes('addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)')));
 		bytes4 SELECTOR = ICapswapV2Router02(swapRouter).addLiquidity.selector;
 
-		(bool success, bytes memory data) = swapRouter.call(abi.encodeWithSelector(SELECTOR, raiseToken, sellToken,lpTokenAmountA,lpTokenAmountB,lpTokenAmountA.mul(97).div(100),lpTokenAmountB.mul(97).div(100),address(this),block.timestamp+60));
+		(bool success, bytes memory data) = swapRouter.call(abi.encodeWithSelector(SELECTOR, raiseToken, sellToken,lpTokenAmountA,lpTokenAmountB,lpTokenAmountA.mul(97).div(100),lpTokenAmountB.mul(97).div(100),address(this),block.timestamp));
 
 		if(success){
 			lpadded = true;
@@ -349,8 +351,38 @@ contract IFOPool is IIFOPool{
 			treasureToken = treasureToken.add(lpTokenAmountB.sub(amountB));
 			refundGas();
 		}
+		else{
+			emit Fail(data);
+		}
 
 		//emit InitLP(amountA,amountB,liquidity);
+	}
+
+	function testInitLP(uint lpA,uint lpB) public {
+		address swapRouter = IIFOFactory(factory).swapRouter();
+
+		IERC20(raiseToken).safeApprove(swapRouter,0);
+		IERC20(raiseToken).safeApprove(swapRouter,lpA);
+		IERC20(sellToken).safeApprove(swapRouter,0);
+		IERC20(sellToken).safeApprove(swapRouter,lpB);
+
+		//bytes4 SELECTOR = bytes4(keccak256(bytes('addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)')));
+		bytes4 SELECTOR = ICapswapV2Router02(swapRouter).addLiquidity.selector;
+
+		(bool success, bytes memory data) = swapRouter.call(abi.encodeWithSelector(SELECTOR, raiseToken, sellToken,lpA,lpB,lpA.mul(97).div(100),lpB.mul(97).div(100),address(this),block.timestamp));
+
+		if(success){
+			lpadded = true;
+			lpInitTime = block.timestamp;
+			(uint amountA, uint amountB, /*uint liquidity*/) 
+				= abi.decode(data, (uint,uint,uint));
+			treasureMoney = treasureMoney.add(lpA.sub(amountA));
+			treasureToken = treasureToken.add(lpA.sub(amountB));
+			refundGas();
+		}
+		else{
+			emit Fail(data);
+		}
 	}
 
 	function refundGas() internal{
