@@ -318,7 +318,7 @@ contract IFOPool is IIFOPool{
 			lpTokenAmountB = sellAmount;
 			
 			treasureMoney = raiseTotal > topLimit ? topLimit.sub(raiseAmount) : raiseTotal.sub(raiseAmount);
-			treasureToken = raiseTotal > topLimit ? sellAmount.mul(excessRate).div(100) : sellAmount.mul(topLimit.sub(raiseTotal)).div(raiseAmount);
+			treasureToken = raiseTotal > topLimit ? 0 : sellAmount.mul(topLimit.sub(raiseTotal)).div(raiseAmount);
 		}
 		settled = true;
 
@@ -326,14 +326,17 @@ contract IFOPool is IIFOPool{
 
 	}
 
-	function initlp() internal{
+	function initlp() external{
 		// make lpPair
 		address swapRouter = IIFOFactory(factory).swapRouter();
 
-		IERC20(sellToken).approve(swapRouter,lpTokenAmountA);
-		IERC20(raiseToken).approve(swapRouter,lpTokenAmountB);
+		IERC20(raiseToken).safeApprove(swapRouter,0);
+		IERC20(raiseToken).safeApprove(swapRouter,lpTokenAmountA);
+		IERC20(sellToken).safeApprove(swapRouter,0);
+		IERC20(sellToken).safeApprove(swapRouter,lpTokenAmountB);
 
-		bytes4 SELECTOR = bytes4(keccak256(bytes('addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)')));
+		//bytes4 SELECTOR = bytes4(keccak256(bytes('addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)')));
+		bytes4 SELECTOR = ICapswapV2Router02(swapRouter).addLiquidity.selector;
 
 		(bool success, bytes memory data) = swapRouter.call(abi.encodeWithSelector(SELECTOR, raiseToken, sellToken,lpTokenAmountA,lpTokenAmountB,lpTokenAmountA.mul(97).div(100),lpTokenAmountB.mul(97).div(100),address(this),block.timestamp+60));
 

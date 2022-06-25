@@ -50,6 +50,7 @@ const config: HardhatUserConfig = {
       gasPrice: 5000000000,
     },
     "cube-mainnet": {
+      //url: "https://http-mainnet.cube.network",
       url: "https://http-mainnet.cube.network",
       accounts:
         process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
