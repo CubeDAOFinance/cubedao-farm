@@ -21,26 +21,27 @@ async function main() {
   const masterchef = '0x6273638e3Be5770851E23bfcE27d69592BEDCd2c';
   const swapFactor = '0x7a1eba426aa389aac9b410cdfe3cef5d344e043f';
   const USDT = '0x9bd522cc85bd1bd6d069d5e273e46ccfee905493';
-/*
+//*
   const Validator= await ethers.getContractFactory("Validator");
   const validator = await Validator.deploy(masterchef, swapFactor,USDT);
   await validator.deployed();
   const validator_addr = validator.address;
   console.log("deploy validator",validator.address);
-*/
+//*/
   const wcube = '0xB9164670A2F388D835B868b3D0D441fa1bE5bb00';
   const swapRouter = '0x14c02dc9b29ac28e852f740cba6722bc7308feb8';
 
-/*
+//*
   const IFOFactory = await ethers.getContractFactory("IFOFactory");
   const ifoFactory = await IFOFactory.deploy(wcube,swapRouter,validator_addr);
   await ifoFactory.deployed();
   const ifoFactory_addr = ifoFactory.address;
   console.log("deploy ifoFactory",ifoFactory.address);
-*/
+//*/
+/*
   const IFOFactory = await ethers.getContractFactory("IFOFactory");
   const ifoFactory = IFOFactory.attach('0xE5D159EfC2F98fa2DAFae2E15f3cCBF3Dbbd5c89')
-
+*/
   // setFeeTo
   const setFeeTo = await ifoFactory.setFeeTo(deployer.address);
   await setFeeTo.wait();
