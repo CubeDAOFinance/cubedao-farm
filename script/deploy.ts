@@ -19,21 +19,21 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
 
-  const CapricornToken= await ethers.getContractFactory("CapricornToken");
-  const CORN = await CapricornToken.deploy();
-  await CORN.deployed();
-  console.log("CapricornToken deployed to:", CORN.address);
+  const CubedaoToken= await ethers.getContractFactory("CubedaoToken");
+  const CDAO = await CubedaoToken.deploy();
+  await CDAO.deployed();
+  console.log("CubedaoToken deployed to:", CDAO.address);
 
   const Syrup= await ethers.getContractFactory("SyrupBar");
-  const syrup= await Syrup.deploy(CORN.address);
+  const syrup= await Syrup.deploy(CDAO.address);
   await syrup.deployed();
   console.log("SyrupBar deployed to:", syrup.address);
 
-  const CORNPerBlock = "45000000000000000000";
+  const CDAOPerBlock = "45000000000000000000";
   const startBlock = 436315;
-  const devaddr = '0xf263720272cd382b43abf6ab73f09cf18e1372cd';
+  const devaddr = '0xb05E987a2263B765928F9e67BA5494E727832f11';
   const MasterChef= await ethers.getContractFactory("MasterChef");
-  const masterchef= await MasterChef.deploy(CORN.address,syrup.address,devaddr,CORNPerBlock,startBlock);
+  const masterchef= await MasterChef.deploy(CDAO.address,syrup.address,devaddr,CDAOPerBlock,startBlock);
   await masterchef.deployed();
   console.log("MasterChef deployed to:", masterchef.address);
 
@@ -46,37 +46,37 @@ async function main() {
 
   const add1 = "0x11B17722F0E877Aa5B4CbEDCC448aD5CC97E8268";
   const mintAmount1 = "20000000000000000000000000";
-  const firstMint1= await CORN.mint(add1,mintAmount1);
+  const firstMint1= await CDAO.mint(add1,mintAmount1);
   // wait until the transaction is mined
   await firstMint1.wait();
-  console.log("Mint:",await CORN.balanceOf(add1));
+  console.log("Mint:",await CDAO.balanceOf(add1));
 
   const add2 = "0xfdE3ee0f427AD75A5a057F26Ab87E051BE44F6Ef";
   const mintAmount2 = "2000000000000000000000000";
-  const firstMint2= await CORN.mint(add2,mintAmount2);
+  const firstMint2= await CDAO.mint(add2,mintAmount2);
   // wait until the transaction is mined
   await firstMint2.wait();
-  console.log("Mint:",await CORN.balanceOf(add2));
+  console.log("Mint:",await CDAO.balanceOf(add2));
 
   const add3 = "0x3B024d206358aA2c6794219Eed418f5f903F567C";
   const mintAmount3 = "3000000000000000000000000";
-  const firstMint3= await CORN.mint(add3,mintAmount3);
+  const firstMint3= await CDAO.mint(add3,mintAmount3);
   // wait until the transaction is mined
   await firstMint3.wait();
-  console.log("Mint:",await CORN.balanceOf(add3));
+  console.log("Mint:",await CDAO.balanceOf(add3));
 
   const add4 = "0xCaaD0A0840ed34D138d9961b3903185064F13BbE";
   const mintAmount4 = "25000000000000000000000000";
-  const firstMint4= await CORN.mint(add4,mintAmount4);
+  const firstMint4= await CDAO.mint(add4,mintAmount4);
   // wait until the transaction is mined
   await firstMint4.wait();
-  console.log("Mint:",await CORN.balanceOf(add4));
+  console.log("Mint:",await CDAO.balanceOf(add4));
 
 
-  const setCornOwner = await CORN.transferOwnership(masterchef.address);
+  const setCdaoOwner = await CDAO.transferOwnership(masterchef.address);
   // wait until the transaction is mined
-  await setCornOwner.wait();
-  console.log("set Corn owner:",await CORN.owner());
+  await setCdaoOwner.wait();
+  console.log("set Cdao owner:",await CDAO.owner());
 
   const setSyrupBarOwner = await syrup.transferOwnership(masterchef.address);
   // wait until the transaction is mined
